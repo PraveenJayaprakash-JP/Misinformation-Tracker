@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>FactScope - AI Misinformation Detector</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; overscroll-behavior: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 2px; }
+        /* Style for the new modal */
+        #correction-modal { backdrop-filter: blur(5px); }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+    <div class="w-full max-w-md mx-auto h-screen flex flex-col bg-gray-800 shadow-2xl">
+        <!-- Header -->
+        <header class="bg-gray-900/80 backdrop-blur-sm p-4 border-b border-gray-700 shadow-lg sticky top-0 z-10">
+            <div class="flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-blue-400"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                <h1 class="text-xl font-bold text-white">FactScope</h1>
+            </div>
+        </header>
+
+        <!-- Main Content & Results Area -->
+        <main id="main-content" class="flex-1 overflow-y-auto p-6 custom-scrollbar">
+            <!-- Welcome Message -->
+            <div id="welcome-message" class="text-center text-gray-400 mt-16">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                <h2 class="mt-2 text-lg font-medium">Ready to Analyze</h2>
+                <p class="text-sm">Paste text or upload an image to check for misinformation.</p>
+            </div>
+            
+            <!-- Image Preview Section -->
+            <div id="image-preview-container" class="hidden mb-4 relative w-2/3 mx-auto">
+                <img id="image-preview" class="rounded-lg shadow-lg w-full" alt="Image preview"/>
+                <button id="remove-image-btn" class="absolute -top-2 -right-2 bg-gray-900/80 rounded-full h-7 w-7 flex items-center justify-center text-white font-bold cursor-pointer">&times;</button>
+            </div>
+
+            <!-- Primary Results Section -->
+            <div id="results-section" class="hidden">
+                <div class="bg-gray-700 p-4 rounded-lg border border-gray-600">
+                    <div class="mb-4">
+                        <h3 class="font-bold text-lg mb-2">Verdict: <span id="verdict" class="font-bold"></span></h3>
+                    </div>
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-200 mb-2">Explanation:</h3>
+                        <p id="explanation" class="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed"></p>
+                    </div>
+                    <div class="mb-4">
+                        <h3 class="font-semibold text-gray-200 mb-2">Sources Found:</h3>
+                        <div id="sources" class="space-y-2"></div>
+                    </div>
+                    <!-- Action Buttons -->
+                    <div id="action-buttons" class="mt-6 pt-4 border-t border-gray-600 flex flex-col gap-3">
+                         <!-- NEW WINNING FEATURE BUTTON -->
+                        <button id="correct-record-btn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm px-5 py-3 text-center transition duration-300 ease-in-out flex items-center justify-center gap-2">
+                            <span class="button-text">🚀 Correct the Record</span>
+                            <svg class="animate-spin h-5 w-5 text-white hidden button-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </button>
+                        <div class="flex sm:flex-row flex-col gap-3">
+                            <button id="summarize-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center transition duration-300 ease-in-out flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span class="button-text">✨ Summarize</span>
+                            </button>
+                            <button id="bias-btn" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg text-sm px-5 py-2.5 text-center transition duration-300 ease-in-out flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed">
+                                <span class="button-text">✨ Analyze Bias</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Input Area -->
+        <footer class="bg-gray-900/80 backdrop-blur-sm p-3 border-t border-gray-700 sticky bottom-0">
+            <div class="flex items-center gap-3">
+                <input type="file" id="image-input" class="hidden" accept="image/*">
+                <button id="image-upload-btn" class="p-2 rounded-full hover:bg-gray-700 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
+                </button>
+                <textarea id="news-text" rows="1" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 placeholder-gray-400 resize-none" placeholder="Paste text or upload image..."></textarea>
+                <button id="analyze-btn" class="bg-blue-600 hover:bg-blue-700 p-3 rounded-full text-white transition-all duration-300 flex-shrink-0">
+                    <svg id="send-icon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.428A1 1 0 009.894 15V9.414l-2.707 2.707a1 1 0 00-1.414 1.414l4 4a1 1 0 001.414 0l4-4a1 1 0 00-1.414-1.414L10.106 9.414V15a1 1 0 00.707.957l5 1.428a1 1 0 001.17-1.409l-7-14z" /></svg>
+                    <svg id="spinner" class="animate-spin h-5 w-5 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- NEW: "Correct the Record" Modal -->
+    <div id="correction-modal" class="fixed inset-0 bg-black/50 items-center justify-center p-4 hidden z-50">
+        <div class="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md border border-gray-700 p-6 flex flex-col gap-4 animate-fade-in">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl font-bold text-blue-300">Correct the Record</h2>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-200 mb-2">The Full Story:</h3>
+                <p id="full-story" class="text-gray-300 text-sm leading-relaxed max-h-48 overflow-y-auto custom-scrollbar"></p>
+            </div>
+            <div>
+                <h3 class="font-semibold text-gray-200 mb-2">Shareable Reply:</h3>
+                <div class="bg-gray-900 p-3 rounded-lg">
+                    <p id="shareable-reply" class="text-gray-300 text-sm leading-relaxed"></p>
+                </div>
+            </div>
+            <button id="copy-reply-btn" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg text-sm px-5 py-3 text-center transition duration-300 ease-in-out">
+                Copy Reply to Clipboard
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- CONFIGURATION ---
+        const API_KEY = 'AIzaSyCavDFjZbvsyBC0Uk8a-7GqzHdQziWVduA'; // IMPORTANT: Replace with your key
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+
+        // --- DOM ELEMENTS ---
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const newsTextInput = document.getElementById('news-text');
+        const mainContent = document.getElementById('main-content');
+        
+        const welcomeMessage = document.getElementById('welcome-message');
+        const resultsSection = document.getElementById('results-section');
+        const verdictEl = document.getElementById('verdict');
+        const explanationEl = document.getElementById('explanation');
+        const sourcesEl = document.getElementById('sources');
+
+        const spinner = document.getElementById('spinner');
+        const sendIcon = document.getElementById('send-icon');
+        
+        const summarizeBtn = document.getElementById('summarize-btn');
+        const biasBtn = document.getElementById('bias-btn');
+        const correctRecordBtn = document.getElementById('correct-record-btn');
+        
+        const imageUploadBtn = document.getElementById('image-upload-btn');
+        const imageInput = document.getElementById('image-input');
+        const imagePreviewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeImageBtn = document.getElementById('remove-image-btn');
+        
+        const correctionModal = document.getElementById('correction-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const fullStoryEl = document.getElementById('full-story');
+        const shareableReplyEl = document.getElementById('shareable-reply');
+        const copyReplyBtn = document.getElementById('copy-reply-btn');
+
+        // --- GLOBAL STATE ---
+        let originalContentParts = [];
+        let verdict = "";
+
+        // --- HELPER FUNCTIONS ---
+        const fileToBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.onerror = error => reject(error);
+        });
+
+        newsTextInput.addEventListener('input', () => {
+            newsTextInput.style.height = 'auto';
+            newsTextInput.style.height = (newsTextInput.scrollHeight) + 'px';
+        });
+
+        // --- IMAGE HANDLING ---
+        imageUploadBtn.addEventListener('click', () => imageInput.click());
+        imageInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                const base64Data = await fileToBase64(file);
+                imagePreview.src = `data:${file.type};base64,${base64Data}`;
+                imagePreviewContainer.classList.remove('hidden');
+            } catch (error) { alert("Could not load image."); }
+        });
+        removeImageBtn.addEventListener('click', () => {
+            imageInput.value = '';
+            imagePreviewContainer.classList.add('hidden');
+        });
+
+        // --- API CALLER ---
+        async function callGemini(parts, systemPrompt, useSearch = false) {
+            const payload = {
+                contents: [{ parts }],
+                tools: useSearch ? [{ "google_search": {} }] : [],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+            };
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) throw new Error(`API Error: ${response.statusText}`);
+            const result = await response.json();
+            const candidate = result.candidates?.[0];
+            if (!candidate) throw new Error("Invalid API response.");
+            return candidate;
+        }
+
+        // --- CORE: ANALYZE CONTENT ---
+        async function analyzeContent() {
+            const text = newsTextInput.value.trim();
+            const imageFile = imageInput.files[0];
+            if (!text && !imageFile) { alert('Please enter text or upload an image.'); return; }
+            if (API_KEY === 'YOUR_GEMINI_API_KEY') { alert('Please add your Gemini API key.'); return; }
+
+            // Loading state
+            sendIcon.classList.add('hidden');
+            spinner.classList.remove('hidden');
+            analyzeBtn.disabled = true;
+
+            originalContentParts = [];
+            if (text) originalContentParts.push({ text });
+            if (imageFile) {
+                const base64Data = await fileToBase64(imageFile);
+                originalContentParts.push({ inlineData: { mimeType: imageFile.type, data: base64Data } });
+            }
+
+            const systemPrompt = `You are "FactScope," an expert AI fact-checker. Analyze the user's content (text and/or image). Use Google Search to find reliable sources. Provide a clear verdict (Likely True, Likely False, Misleading/Lacks Context, Unverifiable) and a detailed, unbiased explanation. Format your response STRICTLY as:
+Verdict: [Your verdict]
+Explanation: [Your detailed explanation]`;
+
+            try {
+                const candidate = await callGemini(originalContentParts, systemPrompt, true);
+                const aiResponseText = candidate.content.parts[0].text;
+
+                const verdictMatch = aiResponseText.match(/Verdict: (.*)/);
+                const explanationMatch = aiResponseText.match(/Explanation: ([\s\S]*)/);
+                verdict = verdictMatch ? verdictMatch[1].trim() : "Could not determine.";
+                const explanation = explanationMatch ? explanationMatch[1].trim() : "No explanation provided.";
+
+                // Update UI
+                welcomeMessage.classList.add('hidden');
+                resultsSection.classList.remove('hidden');
+                verdictEl.textContent = verdict;
+                setVerdictColor(verdict);
+                explanationEl.textContent = explanation;
+                displaySources(candidate.groundingMetadata);
+                
+                // Show/hide "Correct the Record" button
+                if (verdict === 'Likely False' || verdict === 'Misleading/Lacks Context') {
+                    correctRecordBtn.classList.remove('hidden');
+                } else {
+                    correctRecordBtn.classList.add('hidden');
+                }
+
+                // Disable secondary features for image analysis
+                const isImageAnalysis = !!imageFile;
+                summarizeBtn.disabled = isImageAnalysis;
+                biasBtn.disabled = isImageAnalysis;
+
+            } catch (error) { console.error("Error:", error); alert('An error occurred.'); } 
+            finally {
+                sendIcon.classList.remove('hidden');
+                spinner.classList.add('hidden');
+                analyzeBtn.disabled = false;
+            }
+        }
+
+        // --- WINNING FEATURE: CORRECT THE RECORD ---
+        async function correctTheRecord() {
+            const button = correctRecordBtn;
+            const buttonSpinner = button.querySelector('.button-spinner');
+            button.disabled = true;
+            buttonSpinner.classList.remove('hidden');
+            
+            const systemPrompt = `The user has identified misinformation. Your task is to help them correct it constructively.
+1.  **The Full Story**: Based on the provided content, explain the real facts and context in a clear, neutral tone.
+2.  **Shareable Reply**: Draft a polite, concise, and fact-based social media reply that the user can copy. Start with a neutral phrase like "Here's some additional context on this:" or "Actually, it looks like the real story is a bit different:". Do not use hashtags.
+Format your response STRICTLY as:
+## The Full Story
+[Your detailed explanation of the facts]
+## Shareable Reply
+[Your drafted social media comment]`;
+
+            try {
+                const candidate = await callGemini(originalContentParts, systemPrompt, true);
+                const aiResponseText = candidate.content.parts[0].text;
+
+                const storyMatch = aiResponseText.match(/## The Full Story([\s\S]*)## Shareable Reply/);
+                const replyMatch = aiResponseText.match(/## Shareable Reply([\s\S]*)/);
+
+                fullStoryEl.textContent = storyMatch ? storyMatch[1].trim() : "Could not generate the full story.";
+                shareableReplyEl.textContent = replyMatch ? replyMatch[1].trim() : "Could not generate a reply.";
+                
+                correctionModal.classList.remove('hidden');
+                correctionModal.classList.add('flex');
+
+            } catch(error) { console.error("Correct Record Error:", error); alert('Could not generate a correction.'); }
+            finally {
+                button.disabled = false;
+                buttonSpinner.classList.add('hidden');
+            }
+        }
+
+        // --- UI & Event Listeners ---
+        function setVerdictColor(v) {
+            verdictEl.className = 'font-bold';
+            if (v === 'Likely True') verdictEl.classList.add('text-green-400');
+            else if (v === 'Likely False') verdictEl.classList.add('text-red-400');
+            else if (v === 'Misleading/Lacks Context') verdictEl.classList.add('text-yellow-400');
+            else verdictEl.classList.add('text-gray-400');
+        }
+
+        function displaySources(metadata) {
+            sourcesEl.innerHTML = '';
+            const sources = (metadata?.groundingAttributions || [])
+                .map(attr => ({ uri: attr.web?.uri, title: attr.web?.title }))
+                .filter(s => s.uri && s.title);
+            if (sources.length > 0) {
+                sources.forEach(source => {
+                    const link = document.createElement('a');
+                    link.href = source.uri;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.className = 'block bg-gray-800 hover:bg-gray-600 p-2 rounded-md text-blue-400 text-sm truncate transition';
+                    link.textContent = source.title;
+                    sourcesEl.appendChild(link);
+                });
+            } else {
+                sourcesEl.innerHTML = '<p class="text-gray-400 text-sm">No web sources were cited for this response.</p>';
+            }
+        }
+
+        copyReplyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(shareableReplyEl.textContent).then(() => {
+                copyReplyBtn.textContent = 'Copied!';
+                setTimeout(() => { copyReplyBtn.textContent = 'Copy Reply to Clipboard'; }, 2000);
+            });
+        });
+
+        analyzeBtn.addEventListener('click', analyzeContent);
+        correctRecordBtn.addEventListener('click', correctTheRecord);
+        closeModalBtn.addEventListener('click', () => correctionModal.classList.add('hidden'));
+        
+        // Summarize and Bias buttons are placeholders for now, can be implemented similarly
+        summarizeBtn.addEventListener('click', () => alert('Summarize feature coming soon!'));
+        biasBtn.addEventListener('click', () => alert('Bias analysis feature coming soon!'));
+    </script>
+</body>
+</html>
+
