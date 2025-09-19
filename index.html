@@ -58,6 +58,7 @@
                              <div id="confidence-bar" class="bg-blue-500 h-2 rounded-full progress-bar"></div>
                          </div>
                     </div>
+                    
                     <div class="mb-4">
                         <h3 class="font-semibold text-gray-200 mb-2">Explanation:</h3>
                         <p id="explanation" class="text-gray-300 whitespace-pre-wrap text-sm leading-relaxed"></p>
@@ -66,11 +67,44 @@
                         <h3 class="font-semibold text-gray-200 mb-2">Source Verification (from Input):</h3>
                         <div id="verified-sources" class="space-y-2"></div>
                     </div>
-                    <div class="mb-4">
-                        <h3 class="font-semibold text-gray-200 mb-2">Evidence Links (from Web Search):</h3>
-                        <div id="sources" class="space-y-2"></div>
+                     <!-- Secondary Analysis Sections -->
+                    <div id="secondary-analysis-section" class="hidden mt-4 pt-4 border-t border-gray-600 space-y-4">
+                         <div class="bg-gray-800 p-3 rounded-lg">
+                            <h4 class="font-semibold text-gray-300 text-sm mb-1">Evidence Links (from Web Search)</h4>
+                            <div id="sources" class="space-y-2"></div>
+                        </div>
+                        <div class="bg-gray-800 p-3 rounded-lg">
+                            <h4 class="font-semibold text-gray-300 text-sm mb-1">Content Summary (TL;DR)</h4>
+                            <p id="summary" class="text-gray-300 text-sm"></p>
+                        </div>
+                        <div class="bg-gray-800 p-3 rounded-lg">
+                            <h4 class="font-semibold text-gray-300 text-sm mb-1">Bias & Sentiment Analysis</h4>
+                            <p id="bias" class="text-white font-medium"></p>
+                        </div>
                     </div>
                     
+                    <!-- Action Buttons -->
+                    <div id="action-buttons" class="mt-4 pt-4 border-t border-gray-600 flex flex-col gap-3">
+                         <div id="secondary-action-buttons" class="hidden grid grid-cols-3 gap-3">
+                            <button id="find-evidence-btn" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-lg text-sm px-5 py-3 text-center transition duration-300 ease-in-out flex items-center justify-center gap-2">
+                                <span class="button-text">Evidence</span>
+                                <svg class="animate-spin h-5 w-5 text-white hidden button-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </button>
+                            <button id="summarize-btn" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-lg text-sm px-5 py-3 text-center transition duration-300 ease-in-out flex items-center justify-center gap-2">
+                                <span class="button-text">Summarize</span>
+                                <svg class="animate-spin h-5 w-5 text-white hidden button-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </button>
+                            <button id="analyze-bias-btn" class="w-full bg-gray-600 hover:bg-gray-500 text-white font-bold rounded-lg text-sm px-5 py-3 text-center transition duration-300 ease-in-out flex items-center justify-center gap-2">
+                                <span class="button-text">Analyze Bias</span>
+                                <svg class="animate-spin h-5 w-5 text-white hidden button-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            </button>
+                        </div>
+                        <button id="correct-record-btn" class="hidden w-full bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm px-5 py-3 text-center transition duration-300 ease-in-out flex items-center justify-center gap-2">
+                            <span class="button-text">🚀 Correct the Record</span>
+                            <svg class="animate-spin h-5 w-5 text-white hidden button-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        </button>
+                    </div>
+
                     <!-- Feedback Section -->
                     <div id="feedback-section" class="mt-6 pt-4 border-t border-gray-600">
                         <p class="text-center text-sm text-gray-400 mb-2">Was this verdict helpful?</p>
@@ -79,14 +113,6 @@
                             <button id="thumb-down-btn" class="p-2 rounded-full text-2xl hover:bg-gray-600 transition-transform duration-200">👎</button>
                         </div>
                         <p id="feedback-thanks" class="text-center text-sm text-green-400 mt-2 hidden">Thanks for your feedback!</p>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div id="action-buttons" class="mt-4 pt-4 border-t border-gray-600 flex flex-col gap-3">
-                        <button id="correct-record-btn" class="hidden w-full bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm px-5 py-3 text-center transition duration-300 ease-in-out flex items-center justify-center gap-2">
-                            <span class="button-text">🚀 Correct the Record</span>
-                            <svg class="animate-spin h-5 w-5 text-white hidden button-spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                        </button>
                     </div>
                 </div>
             </div>
@@ -146,12 +172,19 @@
             verdictEl: document.getElementById('verdict'),
             confidenceScoreEl: document.getElementById('confidence-score'),
             confidenceBarEl: document.getElementById('confidence-bar'),
+            summaryEl: document.getElementById('summary'),
+            biasEl: document.getElementById('bias'),
             explanationEl: document.getElementById('explanation'),
             sourcesEl: document.getElementById('sources'),
             verifiedSourcesEl: document.getElementById('verified-sources'), 
             sourceVerificationSection: document.getElementById('source-verification-section'), 
             spinner: document.getElementById('spinner'),
             sendIcon: document.getElementById('send-icon'),
+            secondaryAnalysisSection: document.getElementById('secondary-analysis-section'),
+            secondaryActionButtons: document.getElementById('secondary-action-buttons'),
+            findEvidenceBtn: document.getElementById('find-evidence-btn'),
+            summarizeBtn: document.getElementById('summarize-btn'),
+            analyzeBiasBtn: document.getElementById('analyze-bias-btn'),
             correctRecordBtn: document.getElementById('correct-record-btn'),
             imageUploadBtn: document.getElementById('image-upload-btn'),
             imageInput: document.getElementById('image-input'),
@@ -172,6 +205,7 @@
         // --- GLOBAL STATE ---
         let originalContentParts = [];
         let verdict = "";
+        let explanationText = ""; // <-- Variable to hold the explanation
 
         // --- HELPER FUNCTIONS ---
         const fileToBase64 = file => new Promise((resolve, reject) => {
@@ -237,45 +271,38 @@
                 originalContentParts.push({ inlineData: { mimeType: imageFile.type, data: base64Data } });
             }
             
-            // THE DEFINITIVE FIX: New system prompt to force link generation
             const systemPrompt = `You are "FactScope," an expert AI fact-checker. 
             FIRST, DETECT THE LANGUAGE OF THE USER'S TEXT INPUT. ALL YOUR RESPONSES MUST BE IN THAT LANGUAGE.
-            You MUST use Google Search to investigate the user's query. Your explanation MUST be based on the information you find.
-            Your response must have FIVE sections.
+            You MUST use Google Search to investigate the query. Your explanation must be based on information you find.
+            Your response must have FOUR sections.
             1. Verdict: A clear verdict (Likely True, Likely False, etc.).
             2. Confidence: A percentage score (e.g., 87%).
             3. Explanation: A detailed, unbiased explanation based on your search results.
             4. Source Verification: If the user's text contains URLs, analyze their credibility. If not, state "No links were provided for verification."
-            5. Evidence Links: You MUST list the top 1-3 most relevant URLs you visited during your web search to support your explanation. If you could not find any relevant sources, state "No relevant web sources were found."
-
+            
             Format your response STRICTLY as:
             Verdict: [Your verdict]
             Confidence: [A percentage, e.g., 87%]
             Explanation: [Your detailed explanation]
             Source Verification:
-            [VERDICT] - https://www.youtube.com/watch?v=KsZ6tROaVOQ
-            Evidence Links:
-            https://www.youtube.com/watch?v=KsZ6tROaVOQ
-            https://www.youtube.com/watch?v=-s7TCuCpB5c`;
+            [VERDICT] - https://www.youtube.com/watch?v=KsZ6tROaVOQ`;
 
             try {
                 const candidate = await callGemini(originalContentParts, systemPrompt, true);
                 const aiResponseText = candidate.content.parts[0].text;
                 
-                // Updated parsing to handle the new section
                 const verdictMatch = aiResponseText.match(/Verdict: (.*)/);
                 const confidenceMatch = aiResponseText.match(/Confidence: (.*?%)/);
                 const explanationMatch = aiResponseText.match(/Explanation: ([\s\S]*?)Source Verification:/);
-                const sourcesMatch = aiResponseText.match(/Source Verification:([\s\S]*?)Evidence Links:/);
-                const evidenceLinksMatch = aiResponseText.match(/Evidence Links:([\s\S]*)/);
+                const sourcesMatch = aiResponseText.match(/Source Verification:([\s\S]*)/);
 
                 verdict = verdictMatch ? verdictMatch[1].trim() : "Could not determine.";
                 const confidence = confidenceMatch ? confidenceMatch[1].trim() : "N/A";
                 const explanation = explanationMatch ? explanationMatch[1].trim() : "No explanation provided.";
+                explanationText = explanation; // <-- Store explanation for secondary analysis
                 const verifiedSourcesText = sourcesMatch ? sourcesMatch[1].trim() : "";
-                const evidenceLinksText = evidenceLinksMatch ? evidenceLinksMatch[1].trim() : "";
                 
-                updateUIAfterAnalysis(verdict, confidence, explanation, evidenceLinksText, verifiedSourcesText);
+                updateUIAfterAnalysis(verdict, confidence, explanation, verifiedSourcesText);
 
             } catch (error) { console.error("Error:", error); alert('An error occurred.'); } 
             finally { 
@@ -287,25 +314,83 @@
             }
         }
         
-        async function correctTheRecord() {
-            const btn = allElements.correctRecordBtn;
-            const btnText = btn.querySelector('.button-text');
+        // --- SECONDARY ANALYSIS FUNCTIONS ---
+        async function getSummary() {
+            const btn = allElements.summarizeBtn;
+            const spinner = btn.querySelector('.button-spinner');
+            
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            allElements.summaryEl.textContent = 'Summarizing...';
+
+            // FIX: Summarize the explanation, not the original input
+            const systemPrompt = `You are a summarization expert. Based on the provided explanation, generate a concise, one-sentence summary (a TL;DR). Respond only with the summary text itself.`;
+            const summaryParts = [{ text: explanationText }];
+            
+            try {
+                const candidate = await callGemini(summaryParts, systemPrompt, false);
+                allElements.summaryEl.textContent = candidate.content.parts[0].text;
+            } catch (error) {
+                allElements.summaryEl.textContent = 'Could not generate summary.';
+            } finally {
+                spinner.classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+        
+        async function getBiasAnalysis() {
+            const btn = allElements.analyzeBiasBtn;
             const spinner = btn.querySelector('.button-spinner');
 
             btn.disabled = true;
-            btnText.textContent = 'Generating...';
+            spinner.classList.remove('hidden');
+            allElements.biasEl.textContent = 'Analyzing...';
+            
+            // Analyze the original content for bias
+            const systemPrompt = `You are a media bias and sentiment analysis expert. Analyze the provided content for emotional tone and potential bias. Respond in the format: "Tone: [Emotion] ([Confidence %])"`;
+            
+            try {
+                const candidate = await callGemini(originalContentParts, systemPrompt, false);
+                allElements.biasEl.textContent = candidate.content.parts[0].text;
+            } catch (error) {
+                allElements.biasEl.textContent = 'Could not perform analysis.';
+            } finally {
+                spinner.classList.add('hidden');
+                btn.disabled = false;
+            }
+        }
+        
+        async function getEvidenceLinks() {
+            const btn = allElements.findEvidenceBtn;
+            const spinner = btn.querySelector('.button-spinner');
+
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            allElements.sourcesEl.innerHTML = '<p class="text-gray-400 text-sm">Searching for evidence...</p>';
+            
+            const systemPrompt = `You are a research assistant. Based on the user's original content, use Google Search to find the top 1-3 most relevant and authoritative web pages that either confirm or debunk the information. Respond ONLY with the list of URLs, one per line. Do not add any other text.`;
+            
+            try {
+                const candidate = await callGemini(originalContentParts, systemPrompt, true);
+                displaySources(candidate.content.parts[0].text);
+            } catch (error) {
+                allElements.sourcesEl.innerHTML = '<p class="text-gray-400 text-sm">Could not find evidence links.</p>';
+            } finally {
+                spinner.classList.add('hidden');
+                btn.disabled = false; // <-- FIX: Re-enable button
+            }
+        }
+
+        async function correctTheRecord() {
+            const btn = allElements.correctRecordBtn;
+            const spinner = btn.querySelector('.button-spinner');
+
+            btn.disabled = true;
             spinner.classList.remove('hidden');
 
-            const systemPrompt = `You are a helpful assistant for correcting misinformation.
-            You will be given the original content and the verdict that it is false or misleading.
-            FIRST, DETECT THE LANGUAGE OF THE ORIGINAL CONTENT. ALL YOUR RESPONSES MUST BE IN THAT LANGUAGE.
-            Your task is to generate two things:
-            1. Full Story: A concise, neutral, and factual summary of the true information.
-            2. Shareable Reply: A polite, non-confrontational social media comment that corrects the misinformation and provides the true context.
-            
+            const systemPrompt = `You are a helpful assistant for correcting misinformation. You will be given content and a verdict. Your task is to generate a concise, factual summary of the true information ("Full Story") and a polite, shareable social media comment ("Shareable Reply"). Respond in the original language of the content.
             Format your response STRICTLY as:
             Full Story: [Your summary of the facts]
-            
             Shareable Reply: [Your social media comment]`;
 
             try {
@@ -329,7 +414,6 @@
                 alert("Sorry, I couldn't generate a correction at this time.");
             } finally {
                 btn.disabled = false;
-                btnText.textContent = '🚀 Correct the Record';
                 spinner.classList.add('hidden');
             }
         }
@@ -341,9 +425,10 @@
             allElements.analyzeBtn.disabled = isLoading;
         }
 
-        function updateUIAfterAnalysis(v, confidence, explanation, evidenceLinksText, verifiedSourcesText) {
+        function updateUIAfterAnalysis(v, confidence, explanation, verifiedSourcesText) {
             allElements.welcomeMessage.classList.add('hidden');
             allElements.resultsSection.classList.remove('hidden');
+            allElements.secondaryAnalysisSection.classList.add('hidden');
             
             allElements.verdictEl.textContent = v;
             allElements.confidenceScoreEl.textContent = `${confidence} Confidence`;
@@ -354,13 +439,13 @@
             allElements.verdictEl.className = 'font-bold';
             allElements.confidenceBarEl.className = 'h-2 rounded-full progress-bar';
 
-            if (verdictLower.includes('true') || verdictLower.includes('உண்மை')) {
+            if (verdictLower.includes('true')) {
                 allElements.verdictEl.classList.add('text-green-400');
                 allElements.confidenceBarEl.classList.add('bg-green-500');
-            } else if (verdictLower.includes('false') || verdictLower.includes('தவறு')) {
+            } else if (verdictLower.includes('false')) {
                 allElements.verdictEl.classList.add('text-red-400');
                 allElements.confidenceBarEl.classList.add('bg-red-500');
-            } else if (verdictLower.includes('misleading') || verdictLower.includes('context') || verdictLower.includes('தவறாக')) {
+            } else if (verdictLower.includes('misleading') || verdictLower.includes('context')) {
                 allElements.verdictEl.classList.add('text-yellow-400');
                 allElements.confidenceBarEl.classList.add('bg-yellow-500');
             } else {
@@ -369,10 +454,17 @@
             }
             
             allElements.explanationEl.textContent = explanation;
-            displaySources(evidenceLinksText); // <-- Now uses the new text field
             displayVerifiedSources(verifiedSourcesText); 
             
-            if (verdictLower.includes('false') || verdictLower.includes('misleading') || verdictLower.includes('தவறு') || verdictLower.includes('தவறாக')) {
+            allElements.secondaryActionButtons.classList.remove('hidden');
+            allElements.findEvidenceBtn.disabled = false;
+            allElements.summarizeBtn.disabled = false;
+            allElements.analyzeBiasBtn.disabled = false;
+            allElements.summaryEl.innerHTML = '<p class="text-gray-400 text-sm italic">Click "Summarize" to generate.</p>';
+            allElements.biasEl.innerHTML = '<p class="text-gray-400 text-sm italic">Click "Analyze Bias" to generate.</p>';
+            allElements.sourcesEl.innerHTML = '<p class="text-gray-400 text-sm italic">Click "Evidence" to find sources.</p>';
+
+            if (verdictLower.includes('false') || verdictLower.includes('misleading')) {
                 allElements.correctRecordBtn.classList.remove('hidden');
             } else {
                 allElements.correctRecordBtn.classList.add('hidden');
@@ -380,20 +472,15 @@
 
             allElements.feedbackSection.classList.remove('hidden');
             allElements.feedbackThanks.classList.add('hidden');
-            const question = allElements.thumbUpBtn.parentElement.previousElementSibling;
-            const buttonContainer = allElements.thumbUpBtn.parentElement;
-            question.classList.remove('hidden');
-            buttonContainer.classList.remove('hidden');
             allElements.thumbUpBtn.disabled = false;
             allElements.thumbDownBtn.disabled = false;
             allElements.thumbUpBtn.style.transform = 'scale(1)';
             allElements.thumbDownBtn.style.transform = 'scale(1)';
         }
 
-        // Updated displaySources to parse URLs from text
         function displaySources(evidenceLinksText) {
-            allElements.sourcesEl.innerHTML = '';
-            const urls = evidenceLinksText.match(/https?:\/\/[^\s]+/g) || [];
+            const urls = evidenceLinksText ? evidenceLinksText.match(/https?:\/\/[^\s]+/g) || [] : [];
+            allElements.sourcesEl.innerHTML = ''; // Clear previous content
 
             if (urls.length > 0) {
                 urls.forEach(url => {
@@ -401,18 +488,15 @@
                     link.href = url;
                     link.target = '_blank';
                     link.rel = 'noopener noreferrer';
-                    link.className = 'block bg-gray-800 hover:bg-gray-600 p-2 rounded-md text-blue-400 text-sm truncate transition';
-                    // Try to make a nice title from the URL
+                    link.className = 'block bg-gray-900 hover:bg-gray-600 p-2 rounded-md text-blue-400 text-sm truncate transition';
                     try {
                         const urlObj = new URL(url);
                         link.textContent = urlObj.hostname.replace('www.', '');
-                    } catch (e) {
-                        link.textContent = url;
-                    }
+                    } catch (e) { link.textContent = url; }
                     allElements.sourcesEl.appendChild(link);
-});
-            } else {
-                allElements.sourcesEl.innerHTML = '<p class="text-gray-400 text-sm">No web sources were cited for this response.</p>';
+                });
+            } else { // <-- FIX: Handle no sources found case
+                allElements.sourcesEl.innerHTML = '<p class="text-gray-400 text-sm">No relevant web sources were found.</p>';
             }
         }
 
@@ -425,14 +509,11 @@
                 lines.forEach(line => {
                     const [verdict, url] = line.split('-').map(s => s.trim());
                     if (!url) return;
-
                     const container = document.createElement('div');
                     container.className = 'flex items-center gap-2 bg-gray-800 p-2 rounded-md';
-
                     const tag = document.createElement('span');
                     tag.textContent = verdict;
                     tag.className = 'text-xs font-bold px-2 py-1 rounded-full';
-                    
                     if (verdict.toLowerCase().includes('verified')) {
                         tag.classList.add('bg-green-500/20', 'text-green-300');
                     } else if (verdict.toLowerCase().includes('suspicious')) {
@@ -440,16 +521,14 @@
                     } else {
                         tag.classList.add('bg-yellow-500/20', 'text-yellow-300');
                     }
-                    
                     const link = document.createElement('a');
                     link.href = url;
                     link.target = '_blank';
                     link.rel = 'noopener noreferrer';
                     link.textContent = url;
                     link.className = 'text-blue-400 text-sm truncate hover:underline';
-
                     container.appendChild(tag);
-container.appendChild(link);
+                    container.appendChild(link);
                     allElements.verifiedSourcesEl.appendChild(container);
                 });
             } else {
@@ -460,16 +539,13 @@ container.appendChild(link);
         function handleFeedback(isHelpful) {
             allElements.thumbUpBtn.disabled = true;
             allElements.thumbDownBtn.disabled = true;
-            
             if (isHelpful) {
                 allElements.thumbUpBtn.style.transform = 'scale(1.25)';
             } else {
                 allElements.thumbDownBtn.style.transform = 'scale(1.25)';
             }
-
             const question = allElements.thumbUpBtn.parentElement.previousElementSibling;
             const buttonContainer = allElements.thumbUpBtn.parentElement;
-            
             setTimeout(() => {
                 question.classList.add('hidden');
                 buttonContainer.classList.add('hidden');
@@ -478,6 +554,18 @@ container.appendChild(link);
         }
 
         allElements.analyzeBtn.addEventListener('click', analyzeContent);
+        allElements.findEvidenceBtn.addEventListener('click', () => {
+             allElements.secondaryAnalysisSection.classList.remove('hidden');
+             getEvidenceLinks();
+        });
+        allElements.summarizeBtn.addEventListener('click', () => {
+            allElements.secondaryAnalysisSection.classList.remove('hidden');
+            getSummary();
+        });
+        allElements.analyzeBiasBtn.addEventListener('click', () => {
+            allElements.secondaryAnalysisSection.classList.remove('hidden');
+            getBiasAnalysis();
+        });
         allElements.correctRecordBtn.addEventListener('click', correctTheRecord);
         allElements.closeModalBtn.addEventListener('click', () => {
             allElements.correctionModal.classList.add('hidden');
@@ -492,7 +580,6 @@ container.appendChild(link);
                 setTimeout(() => { allElements.copyReplyBtn.textContent = 'Copy Reply'; }, 2000);
             }).catch(err => {
                 console.error('Copy failed', err);
-                // Fallback for older browsers
                 const textarea = document.createElement('textarea');
                 textarea.value = textToCopy;
                 document.body.appendChild(textarea);
@@ -500,9 +587,7 @@ container.appendChild(link);
                 try {
                     document.execCommand('copy');
                     allElements.copyReplyBtn.textContent = 'Copied!';
-                } catch (err) {
-                    allElements.copyReplyBtn.textContent = 'Copy Failed';
-                }
+                } catch (err) { allElements.copyReplyBtn.textContent = 'Copy Failed'; }
                 document.body.removeChild(textarea);
                 setTimeout(() => { allElements.copyReplyBtn.textContent = 'Copy Reply'; }, 2000);
             });
